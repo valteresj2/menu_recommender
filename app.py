@@ -25,12 +25,19 @@
 #bard.get_answer(Prompt)['content']
 from tempfile import NamedTemporaryFile
 import streamlit as st
-from bardapi import Bard
+from bardapi import BardCookies,Bard
 #from langchain.chat_models import ChatOpenAI
 #from langchain.chains.conversation.memory import ConversationBufferWindowMemory
 
 def click_button():
     st.session_state.clicked = True
+
+
+cookie_dict = {
+    "__Secure-1PSID": "cwhfXPk9Wp16QA1k4E0JHQH9SAsH6ULsqFBrvJf97a1-Kjw4xKvvHEH-Iuf9WPAf22ZHPw.",
+    "__Secure-1PSIDTS": "sidts-CjEBNiGH7qX0_i1F77u70nZVl9AisrZAQu18Llc1KI8lCvnZK7FLb3xN2z3LA5cbPyB_EAA",
+    
+}
 
 
 #conversational_memory = ConversationBufferWindowMemory(
@@ -56,6 +63,19 @@ st.header("Please upload an image")
 # upload file
 file = st.file_uploader("", type=["jpeg", "jpg", "png"])
 
+
+text_input_1PSID =st.text_input(
+        "Cole aqui o seu __Secure-1PSID do navegador com a conta Google",
+        "Cole aqui",
+        key="placeholder1",
+    )
+
+text_input_1PSIDTS =st.text_input(
+        "Cole aqui o seu __Secure-1PSIDTS do navegador com a conta Google",
+        "Cole aqui",
+        key="placeholder2",
+    )
+
 if file:
     # display image
     st.image(file, use_column_width=True)
@@ -64,7 +84,10 @@ if file:
     user_question = st.text_input('Ask a question about your image:')
     button_input=st.button("Perguntar!", on_click=click_button)
     if button_input:
-        bard = Bard(token_from_browser=True)
+        #bard = Bard(token_from_browser=True)
+        cookie_dict['__Secure-1PSID']=text_input_1PSID
+        cookie_dict['__Secure-1PSIDTS']=text_input_1PSIDTS
+        bard = BardCookies(cookie_dict=cookie_dict,language='pt')
         with NamedTemporaryFile(dir='.') as f:
             f.write(file.getbuffer())
             image_path = f.name
